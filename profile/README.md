@@ -1,10 +1,14 @@
 # 🌸 PQRS Uniminuto - Arquitectura Agéntica para Floristería Madrid Cundinamarca
 ## 👥 Equipo
 
-- **Edgardo Samuel Barraza Verdesoto** - [edgardo.barraza.v@uniminuto.edu.co](mailto:edgardo.barraza.v@uniminuto.edu.co)
-- **Ericka Alexandra Jimenez Rodriguez** - [erjimenez@uniminuto.edu](mailto:erjimenez@uniminuto.edu)
-- **José Danilo Sánchez Torres** - [jose.sanchez.t@uniminuto.edu](mailto:jose.sanchez.t@uniminuto.edu)
-- **Daniela Alejandra Segura Lazcarro** - [daniela.segura-l@uniminuto.edu.co](mailto:daniela.segura-l@uniminuto.edu.co)
+
+| Nombre Completo | Correo Electrónico |
+| --- | --- |
+| **Edgardo Samuel Barraza Verdesoto** | [edgardo.barraza.v@uniminuto.edu.co](mailto:edgardo.barraza.v@uniminuto.edu.co) |
+| **Ericka Alexandra Jimenez Rodriguez** | [erjimenez@uniminuto.edu](mailto:erjimenez@uniminuto.edu) |
+| **José Danilo Sánchez Torres** | [jose.sanchez.t@uniminuto.edu](mailto:jose.sanchez.t@uniminuto.edu) |
+| **Daniela Alejandra Segura Lazcarro** | [daniela.segura-l@uniminuto.edu.co](mailto:daniela.segura-l@uniminuto.edu.co) |
+
 ## 🎯 Propósito
 
 Sistema inteligente para análisis y gestión de **PQRS** (Peticiones, Quejas, Reclamos y Sugerencias) del sector floricultor en Madrid, Cundinamarca.
@@ -17,80 +21,25 @@ Sistema inteligente para análisis y gestión de **PQRS** (Peticiones, Quejas, R
 
 ## 🏗️ Arquitectura
 
-COMPONENTES PRINCIPALES (4 repositorios):
+### Arquitectura de Componentes (PQRS Floristería)
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  COMPONENTE 1: INGESTA + VALIDACIÓN                             │
-  │  📦 Repo: floristeria/pqrs-ingestion                            │
-  │                                                                  │
-  │  Contiene:                                                       │
-  │  • Dagster pipelines (jobs/schedules/sensors)                   │
-  │  • Conectores a fuentes (Excel, APIs, Email)                    │
-  │  • Validadores Pydantic (reglas de negocio)                     │
-  │                                                                  │
-  │  Tecnología: Python + Dagster + Pydantic                        │
-  │  Escalamiento: Batch / Event-driven                             │
-  └─────────────────────────────────────────────────────────────────┘
+| Componente | Repositorio (`📦`) | Contenido Principal | Tecnología | Escalamiento / Uso |
+| :--- | :--- | :--- | :--- | :--- |
+| **1: Ingesta + Validación** | `floristeria/pqrs-ingestion` | <ul><li>Dagster pipelines (jobs/schedules/sensors)</li><li>Conectores a fuentes (Excel, APIs, Email)</li><li>Validadores Pydantic (reglas de negocio)</li></ul> | Python + Dagster + Pydantic | Batch / Event-driven |
+| **2: Almacenamiento** | `floristeria/pqrs-storage` | <ul><li>Esquemas DWH (PostgreSQL/BigQuery)</li><li>Configuración Vector DB (RedisVL/Qdrant)</li><li>Migraciones (Alembic)</li><li>Clientes de acceso unificados</li></ul> | SQL + Redis + Python clients | Persistencia gestionada |
+| **3: Núcleo Agéntico** | `floristeria/pqrs-agentic` | <ul><li>FastAPI app (endpoints REST)</li><li>Triaje inteligente (selector ML/rules)</li><li>Modelos ML tradicionales (XGBoost, RF)</li><li>CrewAI agents (extractor, clasificador, consolidador)</li><li>Agent Factory (instanciación dinámica)</li></ul> | FastAPI + CrewAI + scikit-learn + Ollama client | Stateless, múltiples réplicas CPU |
+| **4: Evolución + LLM** | `floristeria/pqrs-llm` | <ul><li>Ollama server config (docker-compose)</li><li>Fine-tuning pipelines (transformers + LoRA)</li><li>Exportación de pesos</li><li>Model registry (versiones)</li></ul> | Ollama + Python (transformers, peft) + Docker | GPU preferible, procesos offline |
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  COMPONENTE 2: ALMACENAMIENTO                                   │
-  │  📦 Repo: floristeria/pqrs-storage                              │
-  │                                                                  │
-  │  Contiene:                                                       │
-  │  • Esquemas DWH (PostgreSQL/BigQuery)                           │
-  │  • Configuración Vector DB (RedisVL/Qdrant)                     │
-  │  • Migraciones (Alembic)                                        │
-  │  • Clientes de acceso unificados                                │
-  │                                                                  │
-  │  Tecnología: SQL + Redis + Python clients                       │
-  │  Escalamiento: Persistencia gestionada                         │
-  └─────────────────────────────────────────────────────────────────┘
+---
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  COMPONENTE 3: NÚCLEO AGÉNTICO                                  │
-  │  📦 Repo: floristeria/pqrs-agentic                              │
-  │                                                                  │
-  │  Contiene:                                                       │
-  │  • FastAPI app (endpoints REST)                                 │
-  │  • Triaje inteligente (selector ML/rules)                       │
-  │  • Modelos ML tradicionales (XGBoost, RF)                       │
-  │  • CrewAI agents (extractor, clasificador, consolidador)        │
-  │  • Agent Factory (instanciación dinámica)                       │
-  │                                                                  │
-  │  Tecnología: FastAPI + CrewAI + scikit-learn + Ollama client   │
-  │  Escalamiento: Stateless, múltiples réplicas CPU                │
-  └─────────────────────────────────────────────────────────────────┘
+### Componente Transversal
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  COMPONENTE 4: EVOLUCIÓN + LLM                                  │
-  │  📦 Repo: floristeria/pqrs-llm                                  │
-  │                                                                  │
-  │  Contiene:                                                       │
-  │  • Ollama server config (docker-compose)                        │
-  │  • Fine-tuning pipelines (transformers + LoRA)                  │
-  │  • Exportación de pesos                                          │
-  │  • Model registry (versiones)                                   │
-  │                                                                  │
-  │  Tecnología: Ollama + Python (transformers, peft) + Docker      │
-  │  Escalamiento: GPU preferible, procesos offline                 │
-  └─────────────────────────────────────────────────────────────────┘
-
-COMPONENTE TRANSVERSAL (1 librería compartida):
-
-  ┌─────────────────────────────────────────────────────────────────┐
-  │  LIBRERÍA COMPARTIDA                                            │
-  │  📦 Repo: floristeria/pqrs-core                                 │
-  │                                                                  │
-  │  Contiene:                                                       │
-  │  • Contratos/eventos (Pydantic models)                          │
-  │  • Interfaces ABC (ports)                                       │
-  │  • Utilidades comunes                                            │
-  │                                                                  │
-  │  Uso: pip install floristeria-pqrs-core en los 4 componentes    │
-  └─────────────────────────────────────────────────────────────────┘
-
+| Librería Compartida | Repositorio (`📦`) | Contenido Principal | Modo de Uso |
+| :--- | :--- | :--- | :--- |
+| **pqrs-core** | `floristeria/pqrs-core` | <ul><li>Contratos/eventos (Pydantic models)</li><li>Interfaces ABC (ports)</li><li>Utilidades comunes</li></ul> | `pip install floristeria-pqrs-core` <br>*(Instalada en los 4 componentes principales)* |
 
 ### Estructura general de carpetas
+```
 
 github.com/floristeria-madrid/
 │
@@ -179,11 +128,12 @@ github.com/floristeria-madrid/
     ├── arquitectura/
     ├── despliegue/
     └── desarrolladores
-
+```
 
 
 ### Conexion
 
+```
 Flujo de datos:
 
   pqrs-ingestion ──(Kafka/Redis)──► pqrs-agentic
@@ -205,3 +155,4 @@ Dependencias:
 
   pqrs-agentic ──► pqrs-storage (cliente DB)
   pqrs-agentic ──► pqrs-llm (cliente Ollama)
+```
